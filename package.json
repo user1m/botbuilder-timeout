@@ -1,0 +1,20 @@
+{
+  "name": "botbuilder-timeout",
+  "version": "1.0.0",
+  "description": "Module for Microsoft Bot Framework to enable your bot to prompt the user if the bot detects inactivity and ultimtely end the conversation if no user activity after a defined period of time. ",
+  "main": "./dist/timeout.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "Microsot",
+    "Bots",
+    "Bot",
+    "Framework"
+  ],
+  "author": "Claudius Mbemba",
+  "license": "MIT",
+  "devDependencies": {
+    "botbuilder": "^3.11.0"
+  }
+}
