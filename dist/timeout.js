@@ -18,9 +18,20 @@ class Timeout {
     }
     init() {
         const _this = this;
+        this.bot.on("conversationUpdate", (message) => {
+            if (message.membersAdded) {
+                message.membersAdded.forEach(identity => {
+                    if (identity.id === message.address.bot.id && message.address.user.name) {
+                        console.log(JSON.stringify(identity));
+                        console.log(JSON.stringify(message.address));
+                    }
+                });
+            }
+        });
         this.bot.use({
             botbuilder: function (session, next) {
-                _this.sessionAliasStore.set(session.message.address, session);
+                console.log(JSON.stringify(session.message.address));
+                _this.sessionAliasStore.set(session.message.address.id, session);
                 next();
             },
             receive: function (event, next) {

@@ -10,7 +10,7 @@ export interface TimeoutOptions {
 
 export class Timeout {
 
-    private bot;
+    private bot: builder.UniversalBot;
     public promptHandler = null;
     public endConvoHandler = null;
     private sessionAliasStore = new Map<any, any>();
@@ -29,10 +29,24 @@ export class Timeout {
 
     public init() {
         const _this = this;
+
+        this.bot.on("conversationUpdate", (message) => {
+            if (message.membersAdded) {
+                message.membersAdded.forEach(identity => {
+                    if (identity.id === message.address.bot.id && message.address.user.name) {
+                        console.log(JSON.stringify(identity));
+                        console.log(JSON.stringify(message.address as any));
+                        // _this.sessionAliasStore.set(message.address.id, (message.address as any));
+                    }
+                });
+            }
+        });
+
         this.bot.use({
             botbuilder: function (session: builder.Session, next: Function) {
                 //get an alias to session so we can use it for our timeout functions
-                _this.sessionAliasStore.set((session.message.address as any), session);
+                console.log(JSON.stringify(session.message.address as any));
+                _this.sessionAliasStore.set((session.message.address as any).id, session);
                 next();
             },
             receive: function (event: builder.IEvent, next: Function) {
