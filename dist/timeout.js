@@ -5,6 +5,7 @@ class Timeout {
     constructor(bot, options) {
         this.promptHandler = null;
         this.endConvoHandler = null;
+        this.sessionAliasStore = new Map();
         this.options = {
             PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
             PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: 'Yes',
@@ -19,7 +20,7 @@ class Timeout {
         const _this = this;
         this.bot.use({
             botbuilder: function (session, next) {
-                _this.sessionAlias = session;
+                _this.sessionAliasStore.set(session.message.address, session);
                 next();
             },
             receive: function (event, next) {
@@ -30,7 +31,7 @@ class Timeout {
             },
             send: function (event, next) {
                 if (_this.promptHandler === null) {
-                    _this.promptUserIsActive(_this.sessionAlias);
+                    _this.promptUserIsActive(_this.sessionAliasStore.get((event.address)));
                 }
                 next();
             }

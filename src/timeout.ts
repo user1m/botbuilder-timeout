@@ -13,7 +13,7 @@ export class Timeout {
     private bot;
     public promptHandler = null;
     public endConvoHandler = null;
-    private sessionAlias;
+    private sessionAliasStore = new Map<any, any>();
     private options: TimeoutOptions = {
         PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
         PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: 'Yes',
@@ -32,20 +32,20 @@ export class Timeout {
         this.bot.use({
             botbuilder: function (session: builder.Session, next: Function) {
                 //get an alias to session so we can use it for our timeout functions
-                _this.sessionAlias = session;
+                _this.sessionAliasStore.set((session.message.address as any), session);
                 next();
             },
-            receive: function (event: any, next: any) {
+            receive: function (event: builder.IEvent, next: Function) {
                 //clear timeout handlers when we receive message from user
                 clearTimeout(_this.promptHandler);
                 clearTimeout(_this.endConvoHandler);
                 _this.promptHandler = null;
                 next();
             },
-            send: function (event: any, next: any) {
+            send: function (event: builder.IEvent, next: Function) {
                 if (_this.promptHandler === null) {
                     //start timer when we send message to user
-                    _this.promptUserIsActive(_this.sessionAlias);
+                    _this.promptUserIsActive(_this.sessionAliasStore.get((event.address) as any));
                 }
                 next();
             }

@@ -10,7 +10,7 @@ export declare class Timeout {
     private bot;
     promptHandler: any;
     endConvoHandler: any;
-    private sessionAlias;
+    private sessionAliasStore;
     private options;
     constructor(bot: builder.UniversalBot, options: TimeoutOptions);
     init(): void;
