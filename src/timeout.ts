@@ -38,6 +38,7 @@ export class Timeout {
             botbuilder: function (session: builder.Session, next: Function) {
                 //get an alias to session so we can use it for our timeout functions
                 _this.timeoutStore.set(session.message.address.conversation.id, { session: session, promptHandler: null, endConvoHandler: null });
+                // console.log("ACTIVE CONVERSATIONS:", _this.timeoutStore.size);
                 next();
             },
             receive: function (event: builder.IEvent, next: Function) {
@@ -73,6 +74,8 @@ export class Timeout {
 
             //remove conversation from timeout store
             _this.timeoutStore.delete(session.message.address.conversation.id);
+
+            // console.log("ACTIVE CONVERSATIONS:", _this.timeoutStore.size);
 
         }, _this.options.END_CONVERSATION_TIMEOUT);
     }
