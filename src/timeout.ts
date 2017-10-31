@@ -1,21 +1,30 @@
 import * as builder from "botbuilder";
 
+export interface TimeoutOptions {
+    PROMPT_IF_USER_IS_ACTIVE_MSG: string;
+    PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: string;
+    PROMPT_IF_USER_IS_ACTIVE_TIMEOUT: number;
+    END_CONVERSATION_MSG: string;
+    END_CONVERSATION_TIMEOUT: number;
+}
+
 export class Timeout {
 
     private bot;
     public promptHandler = null;
     public endConvoHandler = null;
     private sessionAlias;
-    private options = {
+    private options: TimeoutOptions = {
         PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
         PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: 'Yes',
         PROMPT_IF_USER_IS_ACTIVE_TIMEOUT: 30000,
-        END_CONVERSATION_MSG: 'Ending conversation since you\'ve been inactive too long. Hope to see you soon.'
+        END_CONVERSATION_MSG: "Ending conversation since you've been inactive too long. Hope to see you soon.",
         END_CONVERSATION_TIMEOUT: 15000
     };
 
-    constructor(bot: builder.UniversalBot) {
+    constructor(bot: builder.UniversalBot, options: TimeoutOptions) {
         this.bot = bot;
+        this.options = Object.assign(this.options, options);
     }
 
     public init() {
@@ -45,7 +54,7 @@ export class Timeout {
 
     private endConversation(session: builder.Session) {
         const _this = this;
-        _this.endConvoHandler = setTimeout(function () {
+        _this.endConvoHandler = setTimeout(() => {
             session.endConversation(_this.options.END_CONVERSATION_MSG);
             clearTimeout(_this.endConvoHandler);
         }, _this.options.END_CONVERSATION_TIMEOUT);
@@ -53,10 +62,15 @@ export class Timeout {
 
     public promptUserIsActive(session: builder.Session) {
         const _this = this;
-        _this.promptHandler = setTimeout(function () {
+        _this.promptHandler = setTimeout(() => {
             builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG, _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: 3 });
             //start end conversation timer after you prompt user
             _this.endConversation(session);
             clearTimeout(_this.promptHandler);
         }, _this.options.PROMPT_IF_USER_IS_ACTIVE_TIMEOUT);
     }
+}
+
+export function setConversationTimeout(bot: builder.UniversalBot, options: TimeoutOptions) {
+    new Timeout(bot, options).init();
+}
