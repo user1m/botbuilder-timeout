@@ -30,23 +30,22 @@ export class Timeout {
     public init() {
         const _this = this;
 
-        this.bot.on("conversationUpdate", (message) => {
-            if (message.membersAdded) {
-                message.membersAdded.forEach(identity => {
-                    if (identity.id === message.address.bot.id && message.address.user.name) {
-                        console.log(JSON.stringify(identity));
-                        console.log(JSON.stringify(message.address as any));
-                        // _this.sessionAliasStore.set(message.address.id, (message.address as any));
-                    }
-                });
-            }
-        });
+        // this.bot.on("conversationUpdate", (message) => {
+        //     if (message.membersAdded) {
+        //         message.membersAdded.forEach(identity => {
+        //             if (identity.id === message.address.bot.id && message.address.user.name) {
+        //                 console.log(JSON.stringify(identity));
+        //                 console.log(JSON.stringify(message.address as any));
+        //                 // _this.sessionAliasStore.set(message.address.id, (message.address as any));
+        //             }
+        //         });
+        //     }
+        // });
 
         this.bot.use({
             botbuilder: function (session: builder.Session, next: Function) {
                 //get an alias to session so we can use it for our timeout functions
-                console.log(JSON.stringify(session.message.address as any));
-                _this.sessionAliasStore.set((session.message.address as any).id, session);
+                _this.sessionAliasStore.set((session.message.address as any).conversation.id, session);
                 next();
             },
             receive: function (event: builder.IEvent, next: Function) {
@@ -59,7 +58,7 @@ export class Timeout {
             send: function (event: builder.IEvent, next: Function) {
                 if (_this.promptHandler === null) {
                     //start timer when we send message to user
-                    _this.promptUserIsActive(_this.sessionAliasStore.get((event.address) as any));
+                    _this.promptUserIsActive(_this.sessionAliasStore.get((event.address) as any).conversation.id);
                 }
                 next();
             }
