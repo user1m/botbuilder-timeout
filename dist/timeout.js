@@ -3,9 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const builder = require("botbuilder");
 class Timeout {
     constructor(bot, options) {
-        this.promptHandler = null;
-        this.endConvoHandler = null;
-        this.sessionAliasStore = new Map();
+        this.timeoutStore = new Map();
         this.options = {
             PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
             PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: 'Yes',
@@ -20,18 +18,23 @@ class Timeout {
         const _this = this;
         this.bot.use({
             botbuilder: function (session, next) {
-                _this.sessionAliasStore.set(session.message.address.conversation.id, session);
+                _this.timeoutStore.set(session.message.address.conversation.id, { session: session, promptHandler: null, endConvoHandler: null });
                 next();
             },
             receive: function (event, next) {
-                clearTimeout(_this.promptHandler);
-                clearTimeout(_this.endConvoHandler);
-                _this.promptHandler = null;
+                if (_this.timeoutStore.get(event.address.conversation.id).promptHandler !== null) {
+                    clearTimeout(_this.timeoutStore.get(event.address.conversation.id).promptHandler);
+                }
+                if (_this.timeoutStore.get(event.address.conversation.id).endConvoHandler !== null) {
+                    clearTimeout(_this.timeoutStore.get(event.address.conversation.id).endConvoHandler);
+                }
+                _this.timeoutStore.get(event.address.conversation.id).promptHandler = null;
+                _this.timeoutStore.get(event.address.conversation.id).endConvoHandler = null;
                 next();
             },
             send: function (event, next) {
-                if (_this.promptHandler === null) {
-                    _this.promptUserIsActive(_this.sessionAliasStore.get((event.address)).conversation.id);
+                if (_this.timeoutStore.get(event.address.conversation.id).promptHandler === null) {
+                    _this.promptUserIsActive(_this.timeoutStore.get(event.address.conversation.id).session);
                 }
                 next();
             }
@@ -39,17 +42,16 @@ class Timeout {
     }
     endConversation(session) {
         const _this = this;
-        _this.endConvoHandler = setTimeout(() => {
+        _this.timeoutStore.get(session.message.address.conversation.id).endConvoHandler = setTimeout(() => {
             session.endConversation(_this.options.END_CONVERSATION_MSG);
-            clearTimeout(_this.endConvoHandler);
+            _this.timeoutStore.delete(session.message.address.conversation.id);
         }, _this.options.END_CONVERSATION_TIMEOUT);
     }
     promptUserIsActive(session) {
         const _this = this;
-        _this.promptHandler = setTimeout(() => {
+        _this.timeoutStore.get(session.message.address.conversation.id).promptHandler = setTimeout(() => {
             builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG, _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: 3 });
             _this.endConversation(session);
-            clearTimeout(_this.promptHandler);
         }, _this.options.PROMPT_IF_USER_IS_ACTIVE_TIMEOUT);
     }
 }

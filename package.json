@@ -4,11 +4,11 @@
   "description": "Module for Microsoft Bot Framework to enable your bot to prompt the user if the bot detects inactivity and ultimately end the conversation if no user activity after a defined period of time. ",
   "main": "./dist/timeout.js",
   "scripts": {
-    "watch": "tsc -w -p tsconfig.json",
-    "test": "npm test"
+    "test": "nodemon ./dist/app",
+    "watch": "tsc -w -p tsconfig.json"
   },
   "keywords": [
-    "Microsot",
+    "Microsoft",
     "Bots",
     "Bot",
     "Framework"
@@ -16,6 +16,8 @@
   "author": "Claudius Mbemba",
   "license": "MIT",
   "devDependencies": {
-    "botbuilder": "^3.11.0"
+    "@types/node": "^8.0.47",
+    "botbuilder": "^3.11.0",
+    "express": "^4.16.2"
   }
 }
