@@ -1,8 +1,7 @@
 # botbuilder-timeout
 
 [![npm](https://img.shields.io/badge/botbuilder--timeout-pass-green.svg)](https://github.com/user1m/botbuilder-timeout/)
-[![license](http://img.shields.io/npm/l/jasmine-console-reporter.svg)](https://github.com/onury/jasmine-console-reporter/blob/master/LICENSE)
-[![downloads](http://img.shields.io/npm/dm/jasmine-console-reporter.svg)](https://www.npmjs.com/package/jasmine-console-reporter)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
 [![dependencies Status](https://david-dm.org/user1m/botbuilder-timeout/status.svg)](https://david-dm.org/user1m/botbuilder-timeout)
 [![maintained](https://img.shields.io/maintenance/yes/2017.svg)](https://github.com/user1m/botbuilder-timeout/graphs/commit-activity)  
 
@@ -26,9 +25,9 @@ _Tested on Node.js v8 or newer._
 ## Usage
 
 ```js
-const timeout = require("./timeout");
+const timeout = require("botbuilder-timeout");
 
-const convoTimeoutOptions = {
+const options = {
     PROMPT_IF_USER_IS_ACTIVE_MSG: "Hey are you there?",
     PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: "Yes I am",
     PROMPT_IF_USER_IS_ACTIVE_TIMEOUT: 15000,
@@ -38,7 +37,7 @@ const convoTimeoutOptions = {
 
 const bot = new builder.UniversalBot(connector);
 
-timeout.setConversationTimeout(bot, convoTimeoutOptions);
+timeout.setConversationTimeout(bot, options);
 
 ```
 
@@ -58,7 +57,7 @@ timeout.setConversationTimeout(bot, convoTimeoutOptions);
 ```js
 import express = require('express');
 import * as builder from 'botbuilder';
-import { setConversationTimeout } from "./timeout";
+import { setConversationTimeout } from "botbuilder-timeout";
 
 console.log(`BOT ID: ${process.env.MICROSOFT_APP_ID}\nBOT PASS: ${process.env.MICROSOFT_APP_PASSWORD}`);
 
@@ -76,14 +75,14 @@ bot.dialog('/', (session, args, next) => {
     session.send('Hello World');
 });
 
-const convoTimeoutOptions = {
+const options = {
     PROMPT_IF_USER_IS_ACTIVE_MSG: "Hey are you there?",
     PROMPT_IF_USER_IS_ACTIVE_TIMEOUT: 15000,
     END_CONVERSATION_MSG: "Conversation Ended",
     END_CONVERSATION_TIMEOUT: 10000
 };
 
-setConversationTimeout(bot, convoTimeoutOptions);
+setConversationTimeout(bot, options);
 
 server.post('/api/messages', connector.listen());
 server.listen(port, () => {
