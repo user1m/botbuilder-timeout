@@ -13,6 +13,6 @@ export declare class Timeout {
     constructor(bot: builder.UniversalBot, options: TimeoutOptions);
     init(): void;
     private endConversation(session);
-    promptUserIsActive(session: builder.Session): void;
+    private promptUserIsActive(session);
 }
 export declare function setConversationTimeout(bot: builder.UniversalBot, options: TimeoutOptions): void;

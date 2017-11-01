@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const builder = require("botbuilder");
+const endOfConversation = "endOfConversation";
 class Timeout {
     constructor(bot, options) {
         this.timeoutStore = new Map();
@@ -33,7 +34,16 @@ class Timeout {
                 next();
             },
             send: function (event, next) {
-                if (_this.timeoutStore.get(event.address.conversation.id).promptHandler === null) {
+                if (event.type === endOfConversation) {
+                    if (_this.timeoutStore.get(event.address.conversation.id).promptHandler !== null) {
+                        clearTimeout(_this.timeoutStore.get(event.address.conversation.id).promptHandler);
+                    }
+                    if (_this.timeoutStore.get(event.address.conversation.id).endConvoHandler !== null) {
+                        clearTimeout(_this.timeoutStore.get(event.address.conversation.id).endConvoHandler);
+                    }
+                    _this.timeoutStore.delete(event.message.address.conversation.id);
+                }
+                if (event.type !== endOfConversation && _this.timeoutStore.get(event.address.conversation.id).promptHandler === null) {
                     _this.promptUserIsActive(_this.timeoutStore.get(event.address.conversation.id).session);
                 }
                 next();

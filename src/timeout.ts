@@ -14,6 +14,7 @@ interface TimeoutProps {
     promptHandler: any;
     endConvoHandler: any;
 }
+const endOfConversation = "endOfConversation";
 
 export class Timeout {
     private bot: builder.UniversalBot;
@@ -56,8 +57,19 @@ export class Timeout {
                 _this.timeoutStore.get(event.address.conversation.id).endConvoHandler = null;
                 next();
             },
-            send: function (event: builder.IEvent, next: Function) {
-                if (_this.timeoutStore.get(event.address.conversation.id).promptHandler === null) {
+            send: function (event: any, next: Function) {
+                if (event.type === endOfConversation) {
+                    //clear timeout handlers
+                    if (_this.timeoutStore.get(event.address.conversation.id).promptHandler !== null) {
+                        clearTimeout(_this.timeoutStore.get(event.address.conversation.id).promptHandler);
+                    }
+                    if (_this.timeoutStore.get(event.address.conversation.id).endConvoHandler !== null) {
+                        clearTimeout(_this.timeoutStore.get(event.address.conversation.id).endConvoHandler);
+                    }
+                    //remove conversation from store
+                    _this.timeoutStore.delete(event.message.address.conversation.id);
+                }
+                if (event.type !== endOfConversation && _this.timeoutStore.get(event.address.conversation.id).promptHandler === null) {
                     //start timer when we send message to user
                     _this.promptUserIsActive(_this.timeoutStore.get(event.address.conversation.id).session);
                 }
@@ -80,7 +92,7 @@ export class Timeout {
         }, _this.options.END_CONVERSATION_TIMEOUT);
     }
 
-    public promptUserIsActive(session: builder.Session) {
+    private promptUserIsActive(session: builder.Session) {
         const _this = this;
         _this.timeoutStore.get(session.message.address.conversation.id).promptHandler = setTimeout(() => {
             //prompt to check if user is still active
