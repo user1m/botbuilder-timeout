@@ -47,11 +47,11 @@ timeout.setConversationTimeout(bot, options);
 
 | Option   | Description |
 | -------- | ----------- |
-| <h4>**`PROMPT_IF_USER_IS_ACTIVE_MSG`**</h4> `String` | Default: `'Are you there?'`. String presented to user to confirm activity
-| <h4>**`PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT`**</h4> `String` | Default: `'Yes'`. String for button during prompt checking for activity
-| <h4>**`PROMPT_IF_USER_IS_ACTIVE_TIMEOUT`**</h4> `Number` | Default: `30000`. Time in `milliseconds` before prompt is presented
-| <h4>**`END_CONVERSATION_MSG`**</h4> `String` | Default: `"Ending conversation since you've been inactive too long. Hope to see you soon."` String sent to user when conversation is ended
-| <h4>**`END_CONVERSATION_TIMEOUT`**</h4> `Number` | Default: `15000`. Time in `milliseconds` before conversation is ended with `END_CONVERSATION_MSG` message |
+| <h4>**`PROMPT_IF_USER_IS_ACTIVE_MSG`**</h4> `String` | Default: `'Are you there?'`. Message presented to user to confirm activity.
+| <h4>**`PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT`**</h4> `String` | Default: `'Yes'`. Button text presented during prompt checking for activity.
+| <h4>**`PROMPT_IF_USER_IS_ACTIVE_TIMEOUT`**</h4> `Number` | Default: `30000`. Time in `milliseconds` before prompt with `PROMPT_IF_USER_IS_ACTIVE_MSG` message is presented.
+| <h4>**`END_CONVERSATION_MSG`**</h4> `String` | Default: `"Ending conversation since you've been inactive too long. Hope to see you soon."` Message sent to user when conversation is ended.
+| <h4>**`END_CONVERSATION_TIMEOUT`**</h4> `Number` | Default: `15000`. Time in `milliseconds` before conversation is ended with `END_CONVERSATION_MSG` message. |
 
 ### Full Example with Botbuilder (Node.js)
 
