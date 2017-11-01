@@ -20,7 +20,7 @@ Example:
 npm install botbuilder-timeout --save-dev
 ```
 
-_Tested on Node.js v8 or newer._
+**Tested on Node.js v8 or newer**
 
 
 ## Usage
@@ -55,7 +55,7 @@ timeout.setConversationTimeout(bot, options);
 | <h4>**`END_CONVERSATION_MSG`**</h4> `String` | Default: `"Ending conversation since you've been inactive too long. Hope to see you soon."` Message sent to user when conversation is ended.
 | <h4>**`END_CONVERSATION_TIMEOUT`**</h4> `Number` | Default: `15000`. Time in `milliseconds` before conversation is ended with `END_CONVERSATION_MSG` message. |
 
-### Full Example with Botbuilder (Node.js/Tppescript)
+### Full Example with Botbuilder (Node.js/Typescript)
 
 ```js
 import express = require('express');
