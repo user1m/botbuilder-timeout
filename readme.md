@@ -74,9 +74,14 @@ const connector = new builder.ChatConnector({
 
 const bot = new builder.UniversalBot(connector);
 
-bot.dialog('/', (session, args, next) => {
-    session.send('Hello World');
-});
+bot.dialog('/', [
+    (session, args, next) => {
+        builder.Prompts.text(session, `What's your name?`);
+    },
+    (session, args, next) => {
+        session.send(`Hi ${session.message.text}`);
+    }]
+);
 
 const options = {
     PROMPT_IF_USER_IS_ACTIVE_MSG: "Hey are you there?",
