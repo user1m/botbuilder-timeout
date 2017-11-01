@@ -7,11 +7,16 @@
     "test": "nodemon ./dist/app",
     "watch": "tsc -w -p tsconfig.json"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user1m/botbuilder-timeout.git"
+  },
   "keywords": [
     "Microsoft",
     "Bots",
-    "Bot",
-    "Framework"
+    "Bot Framework",
+    "Timeout",
+    "Conversation Timeout"
   ],
   "author": "Claudius Mbemba",
   "license": "MIT",
