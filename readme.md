@@ -3,6 +3,7 @@
 [![npm](https://img.shields.io/badge/botbuilder--timeout-pass-green.svg)](https://github.com/user1m/botbuilder-timeout/)
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
 [![dependencies Status](https://david-dm.org/user1m/botbuilder-timeout/status.svg)](https://david-dm.org/user1m/botbuilder-timeout)
+[![devDependencies Status](https://david-dm.org/user1m/botbuilder-timeout/dev-status.svg)](https://david-dm.org/user1m/botbuilder-timeout?type=dev)
 [![maintained](https://img.shields.io/maintenance/yes/2017.svg)](https://github.com/user1m/botbuilder-timeout/graphs/commit-activity)  
 
 > © 2017, Claudius Mbemba ([@user1m](https://github.com/user1m)). MIT License.
