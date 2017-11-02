@@ -33,9 +33,9 @@ const connector = new builder.ChatConnector({...});
 const options = {
     PROMPT_IF_USER_IS_ACTIVE_MSG: "Hey are you there?",
     PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: "Yes I am",
-    PROMPT_IF_USER_IS_ACTIVE_TIMEOUT: 15000,
+    PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS: 15000,
     END_CONVERSATION_MSG: "Conversation Ended",
-    END_CONVERSATION_TIMEOUT: 10000
+    END_CONVERSATION_TIMEOUT_IN_MS: 10000
 };
 
 const bot = new builder.UniversalBot(connector);
@@ -85,9 +85,9 @@ bot.dialog('/', [
 
 const options = {
     PROMPT_IF_USER_IS_ACTIVE_MSG: "Hey are you there?",
-    PROMPT_IF_USER_IS_ACTIVE_TIMEOUT: 15000,
+    PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS: 15000,
     END_CONVERSATION_MSG: "Conversation Ended",
-    END_CONVERSATION_TIMEOUT: 10000
+    END_CONVERSATION_TIMEOUT_IN_MS: 10000
 };
 
 setConversationTimeout(bot, options);

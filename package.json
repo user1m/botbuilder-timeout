@@ -1,6 +1,6 @@
 {
   "name": "botbuilder-timeout",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Module for Microsoft Bot Framework to enable your bot to prompt the user if user is inactive and ultimately end the conversation if no user activity after a defined period of time.",
   "main": "./dist/timeout.js",
   "types": [
