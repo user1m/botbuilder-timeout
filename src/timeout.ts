@@ -1,35 +1,31 @@
 import * as builder from "botbuilder";
+import { TimeoutStore } from "./storage";
 
 export interface TimeoutOptions {
     PROMPT_IF_USER_IS_ACTIVE_MSG?: string;
     PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT?: string;
-    PROMPT_IF_USER_IS_ACTIVE_TIMEOUT?: number;
+    PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS?: number;
     END_CONVERSATION_MSG?: string;
-    END_CONVERSATION_TIMEOUT?: number;
+    END_CONVERSATION_TIMEOUT_IN_MS?: number;
 }
 
-// internal interface
-interface TimeoutProps {
-    session: builder.Session;
-    promptHandler: any;
-    endConvoHandler: any;
-}
 const endOfConversation = "endOfConversation";
 
 export class Timeout {
     private bot: builder.UniversalBot;
-    private timeoutStore = new Map<string, TimeoutProps>();
+    private timeoutStore: TimeoutStore = null;
     private options: TimeoutOptions = {
         PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
         PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: 'Yes',
-        PROMPT_IF_USER_IS_ACTIVE_TIMEOUT: 30000,
+        PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS: 30000,
         END_CONVERSATION_MSG: "Ending conversation since you've been inactive too long. Hope to see you soon.",
-        END_CONVERSATION_TIMEOUT: 15000
+        END_CONVERSATION_TIMEOUT_IN_MS: 15000
     };
 
-    constructor(bot: builder.UniversalBot, options: TimeoutOptions) {
+    constructor(bot: builder.UniversalBot, options: TimeoutOptions, store: TimeoutStore = new TimeoutStore()) {
         this.bot = bot;
         this.options = Object.assign(this.options, options);
+        this.timeoutStore = store;
     }
 
     public init() {
@@ -37,71 +33,71 @@ export class Timeout {
 
         this.bot.use({
             botbuilder: function (session: builder.Session, next: Function) {
-                //get an alias to session so we can use it for our timeout functions
-                _this.timeoutStore.set(session.message.address.conversation.id, { session: session, promptHandler: null, endConvoHandler: null });
+                const convoId = session.message.address.conversation.id;
+                _this.timeoutStore.storeConvoIdAndSession(convoId, session);
                 // console.log("ACTIVE CONVERSATIONS:", _this.timeoutStore.size);
                 next();
             },
             receive: function (event: builder.IEvent, next: Function) {
+                const convoId = event.address.conversation.id;
                 //clear timeout handlers when we receive message from user
-                if (_this.timeoutStore.get(event.address.conversation.id).promptHandler !== null) {
-                    //if the function has not already been executed, stop the execution by calling the clearTimeout() method.
-                    clearTimeout(_this.timeoutStore.get(event.address.conversation.id).promptHandler);
-                }
-                if (_this.timeoutStore.get(event.address.conversation.id).endConvoHandler !== null) {
-                    //if the function has not already been executed, stop the execution by calling the clearTimeout() method.
-                    clearTimeout(_this.timeoutStore.get(event.address.conversation.id).endConvoHandler);
-                }
-                //reset handlers
-                _this.timeoutStore.get(event.address.conversation.id).promptHandler = null;
-                _this.timeoutStore.get(event.address.conversation.id).endConvoHandler = null;
+                _this.clearTimeoutHandlers(convoId);
+                _this.resetHandlers(convoId);
                 next();
             },
             send: function (event: any, next: Function) {
+                const convoId = event.address.conversation.id;
                 if (event.type === endOfConversation) {
-                    //clear timeout handlers
-                    if (_this.timeoutStore.get(event.address.conversation.id).promptHandler !== null) {
-                        clearTimeout(_this.timeoutStore.get(event.address.conversation.id).promptHandler);
-                    }
-                    if (_this.timeoutStore.get(event.address.conversation.id).endConvoHandler !== null) {
-                        clearTimeout(_this.timeoutStore.get(event.address.conversation.id).endConvoHandler);
-                    }
-                    //remove conversation from store
-                    _this.timeoutStore.delete(event.message.address.conversation.id);
+                    _this.clearTimeoutHandlers(event);
+                    _this.timeoutStore.removeConvoFromStore(convoId);
                 }
-                if (event.type !== endOfConversation && _this.timeoutStore.get(event.address.conversation.id).promptHandler === null) {
+                if (event.type !== endOfConversation && _this.timeoutStore.getPromptHandlerFor(convoId) === null) {
                     //start timer when we send message to user
-                    _this.promptUserIsActive(_this.timeoutStore.get(event.address.conversation.id).session);
+                    _this.startPromptTimer(_this.timeoutStore.getSessionFor(convoId));
                 }
                 next();
             }
         });
     }
 
-    private endConversation(session: builder.Session) {
+    private startEndConversationTimer(session: builder.Session) {
         const _this = this;
-        _this.timeoutStore.get(session.message.address.conversation.id).endConvoHandler = setTimeout(() => {
+        const convoId = session.message.address.conversation.id;
+        const handler = setTimeout(() => {
             //message user that conversation is ended
             session.endConversation(_this.options.END_CONVERSATION_MSG);
-
-            //remove conversation from timeout store
-            _this.timeoutStore.delete(session.message.address.conversation.id);
-
             // console.log("ACTIVE CONVERSATIONS:", _this.timeoutStore.size);
+        }, _this.options.END_CONVERSATION_TIMEOUT_IN_MS);
 
-        }, _this.options.END_CONVERSATION_TIMEOUT);
+        _this.timeoutStore.setEndConvoHandlerFor(convoId, handler);
     }
 
-    private promptUserIsActive(session: builder.Session) {
+    private startPromptTimer(session: builder.Session) {
         const _this = this;
-        _this.timeoutStore.get(session.message.address.conversation.id).promptHandler = setTimeout(() => {
+        const convoId = session.message.address.conversation.id;
+        const handler = setTimeout(() => {
             //prompt to check if user is still active
             builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG, _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: 3 });
+            _this.startEndConversationTimer(session);
+        }, _this.options.PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS);
 
-            //start end conversation timer
-            _this.endConversation(session);
+        _this.timeoutStore.setPromptHandlerFor(convoId, handler);
+    }
 
-        }, _this.options.PROMPT_IF_USER_IS_ACTIVE_TIMEOUT);
+    private clearTimeoutHandlers(convoId: string) {
+        if (this.timeoutStore.getPromptHandlerFor(convoId) !== null) {
+            //if the function has not already been executed,
+            //stop the execution by calling the clearTimeout() method.
+            clearTimeout(this.timeoutStore.getPromptHandlerFor(convoId));
+        }
+        if (this.timeoutStore.getEndConvoHandlerFor(convoId) !== null) {
+            clearTimeout(this.timeoutStore.getEndConvoHandlerFor(convoId));
+        }
+    }
+
+    private resetHandlers(convoId: string) {
+        this.timeoutStore.setPromptHandlerFor(convoId, null);
+        this.timeoutStore.setEndConvoHandlerFor(convoId, null);
     }
 }
 
