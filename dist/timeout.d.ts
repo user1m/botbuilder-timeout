@@ -1,5 +1,4 @@
 import * as builder from "botbuilder";
-import { TimeoutStore } from "./storage";
 export interface TimeoutOptions {
     PROMPT_IF_USER_IS_ACTIVE_MSG?: string;
     PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT?: string;
@@ -11,7 +10,7 @@ export declare class Timeout {
     private bot;
     private timeoutStore;
     private options;
-    constructor(bot: builder.UniversalBot, options: TimeoutOptions, store?: TimeoutStore);
+    constructor(bot: builder.UniversalBot, options: TimeoutOptions);
     init(): void;
     private startEndConversationTimer(session);
     private startPromptTimer(session);

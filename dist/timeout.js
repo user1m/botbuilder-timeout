@@ -4,7 +4,7 @@ const builder = require("botbuilder");
 const storage_1 = require("./storage");
 const endOfConversation = "endOfConversation";
 class Timeout {
-    constructor(bot, options, store = new storage_1.TimeoutStore()) {
+    constructor(bot, options) {
         this.timeoutStore = null;
         this.options = {
             PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
@@ -15,7 +15,7 @@ class Timeout {
         };
         this.bot = bot;
         this.options = Object.assign(this.options, options);
-        this.timeoutStore = store;
+        this.timeoutStore = new storage_1.TimeoutStore();
     }
     init() {
         const _this = this;

@@ -22,10 +22,10 @@ export class Timeout {
         END_CONVERSATION_TIMEOUT_IN_MS: 15000
     };
 
-    constructor(bot: builder.UniversalBot, options: TimeoutOptions, store: TimeoutStore = new TimeoutStore()) {
+    constructor(bot: builder.UniversalBot, options: TimeoutOptions) {
         this.bot = bot;
         this.options = Object.assign(this.options, options);
-        this.timeoutStore = store;
+        this.timeoutStore = new TimeoutStore();
     }
 
     public init() {
@@ -77,7 +77,8 @@ export class Timeout {
         const convoId = session.message.address.conversation.id;
         const handler = setTimeout(() => {
             //prompt to check if user is still active
-            builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG, _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: 3 });
+            builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG,
+                _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: 3 });
             _this.startEndConversationTimer(session);
         }, _this.options.PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS);
 
