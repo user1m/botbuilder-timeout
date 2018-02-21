@@ -4,6 +4,7 @@ import { TimeoutStore } from "./storage";
 export interface TimeoutOptions {
     PROMPT_IF_USER_IS_ACTIVE_MSG?: string;
     PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT?: string;
+    PROMPT_USER_IS_ACTIVE_RESPONSE?: string;
     PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS?: number;
     END_CONVERSATION_MSG?: string;
     END_CONVERSATION_TIMEOUT_IN_MS?: number;
@@ -16,6 +17,7 @@ export class Timeout {
     private timeoutStore: TimeoutStore = null;
     private options: TimeoutOptions = {
         PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
+        PROMPT_USER_IS_ACTIVE_RESPONSE: "Sure. Lets start again.",
         PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: 'Yes',
         PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS: 30000,
         END_CONVERSATION_MSG: "Ending conversation since you've been inactive too long. Hope to see you soon.",
@@ -58,6 +60,11 @@ export class Timeout {
                 next();
             }
         });
+        this.bot.dialog('promptTimerDialog',[(session,args)=>{ builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG,
+            _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: builder.ListStyle.button });},(session,results)=>{
+                // session.endDialog()
+                session.endConversation(_this.options.PROMPT_USER_IS_ACTIVE_RESPONSE);
+            }])
     }
 
     private startEndConversationTimer(session: builder.Session) {
@@ -77,8 +84,7 @@ export class Timeout {
         const convoId = session.message.address.conversation.id;
         const handler = setTimeout(() => {
             //prompt to check if user is still active
-            builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG,
-                _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: 3 });
+            session.beginDialog('promptTimerDialog');
             _this.startEndConversationTimer(session);
         }, _this.options.PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS);
 
@@ -92,6 +98,7 @@ export class Timeout {
             clearTimeout(this.timeoutStore.getPromptHandlerFor(convoId));
         }
         if (this.timeoutStore.getEndConvoHandlerFor(convoId) !== null) {
+            
             clearTimeout(this.timeoutStore.getEndConvoHandlerFor(convoId));
         }
     }

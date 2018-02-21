@@ -2,6 +2,7 @@ import * as builder from "botbuilder";
 export interface TimeoutOptions {
     PROMPT_IF_USER_IS_ACTIVE_MSG?: string;
     PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT?: string;
+    PROMPT_USER_IS_ACTIVE_RESPONSE?: string;
     PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS?: number;
     END_CONVERSATION_MSG?: string;
     END_CONVERSATION_TIMEOUT_IN_MS?: number;

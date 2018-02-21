@@ -8,6 +8,7 @@ class Timeout {
         this.timeoutStore = null;
         this.options = {
             PROMPT_IF_USER_IS_ACTIVE_MSG: 'Are you there?',
+            PROMPT_USER_IS_ACTIVE_RESPONSE: "Sure. Lets start again.",
             PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT: 'Yes',
             PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS: 30000,
             END_CONVERSATION_MSG: "Ending conversation since you've been inactive too long. Hope to see you soon.",
@@ -43,6 +44,11 @@ class Timeout {
                 next();
             }
         });
+        this.bot.dialog('promptTimerDialog', [(session, args) => {
+                builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG, _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: builder.ListStyle.button });
+            }, (session, results) => {
+                session.endConversation(_this.options.PROMPT_USER_IS_ACTIVE_RESPONSE);
+            }]);
     }
     startEndConversationTimer(session) {
         const _this = this;
@@ -56,7 +62,7 @@ class Timeout {
         const _this = this;
         const convoId = session.message.address.conversation.id;
         const handler = setTimeout(() => {
-            builder.Prompts.choice(session, _this.options.PROMPT_IF_USER_IS_ACTIVE_MSG, _this.options.PROMPT_IF_USER_IS_ACTIVE_BUTTON_TEXT, { listStyle: 3 });
+            session.beginDialog('promptTimerDialog');
             _this.startEndConversationTimer(session);
         }, _this.options.PROMPT_IF_USER_IS_ACTIVE_TIMEOUT_IN_MS);
         _this.timeoutStore.setPromptHandlerFor(convoId, handler);
