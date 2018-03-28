@@ -48,7 +48,7 @@ export class Timeout {
             send: function (event: any, next: Function) {
                 const convoId = event.address.conversation.id;
                 if (event.type === endOfConversation) {
-                    _this.clearTimeoutHandlers(event);
+                    _this.clearTimeoutHandlers(convoId);
                     _this.timeoutStore.removeConvoFromStore(convoId);
                 }
                 if (event.type !== endOfConversation && _this.timeoutStore.getPromptHandlerFor(convoId) === null) {
